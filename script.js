@@ -9,14 +9,13 @@ function submitFeedback() {
         return;
     }
 
-    let feedback = { name, email, message };
+    db.ref("feedbacks").push({
+        name: name,
+        email: email,
+        message: message
+    });
 
-    let data = JSON.parse(localStorage.getItem("feedbacks")) || [];
-    data.push(feedback);
-
-    localStorage.setItem("feedbacks", JSON.stringify(data));
-
-    alert("Feedback Submitted!");
+    alert("Saved permanently!");
 }
 
 // Admin Login
@@ -30,3 +29,35 @@ function login() {
         alert("Invalid Login");
     }
 }
+
+const firebaseConfig = {
+  apiKey: "YOUR_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  databaseURL: "https://YOUR_PROJECT.firebaseio.com",
+  projectId: "YOUR_PROJECT",
+  storageBucket: "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "XXXX",
+  appId: "XXXX"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+
+let table = document.getElementById("tableData");
+
+db.ref("feedbacks").on("value", snapshot => {
+    table.innerHTML = "";
+
+    snapshot.forEach(child => {
+        let fb = child.val();
+
+        let row = `<tr>
+            <td>${fb.name}</td>
+            <td>${fb.email}</td>
+            <td>${fb.message}</td>
+        </tr>`;
+
+        table.innerHTML += row;
+    });
+});
