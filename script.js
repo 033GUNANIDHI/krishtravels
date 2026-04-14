@@ -1,4 +1,22 @@
-// Submit Feedback
+// ✅ Firebase Config (replace with your real values)
+const firebaseConfig = {
+  apiKey: "YOUR_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  databaseURL: "https://YOUR_PROJECT-default-rtdb.firebaseio.com/",
+  projectId: "YOUR_PROJECT",
+  storageBucket: "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "XXXX",
+  appId: "XXXX"
+};
+
+// ✅ Initialize Firebase FIRST
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+
+// ==========================
+// ✅ Submit Feedback (User Page)
+// ==========================
 function submitFeedback() {
     let name = document.getElementById("name").value;
     let email = document.getElementById("email").value;
@@ -13,12 +31,25 @@ function submitFeedback() {
         name: name,
         email: email,
         message: message
-    });
+    })
+    .then(() => {
+        alert("Saved permanently!");
 
-    alert("Saved permanently!");
+        // Clear fields
+        document.getElementById("name").value = "";
+        document.getElementById("email").value = "";
+        document.getElementById("message").value = "";
+    })
+    .catch((error) => {
+        console.error(error);
+        alert("Error saving data");
+    });
 }
 
-// Admin Login
+
+// ==========================
+// ✅ Admin Login
+// ==========================
 function login() {
     let user = document.getElementById("username").value;
     let pass = document.getElementById("password").value;
@@ -30,34 +61,27 @@ function login() {
     }
 }
 
-const firebaseConfig = {
-  apiKey: "YOUR_KEY",
-  authDomain: "YOUR_PROJECT.firebaseapp.com",
-  databaseURL: "https://YOUR_PROJECT.firebaseio.com",
-  projectId: "YOUR_PROJECT",
-  storageBucket: "YOUR_PROJECT.appspot.com",
-  messagingSenderId: "XXXX",
-  appId: "XXXX"
-};
 
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
-
-
+// ==========================
+// ✅ Load Feedback (Admin Page)
+// ==========================
 let table = document.getElementById("tableData");
 
-db.ref("feedbacks").on("value", snapshot => {
-    table.innerHTML = "";
+// Only run if table exists (important!)
+if (table) {
+    db.ref("feedbacks").on("value", snapshot => {
+        table.innerHTML = "";
 
-    snapshot.forEach(child => {
-        let fb = child.val();
+        snapshot.forEach(child => {
+            let fb = child.val();
 
-        let row = `<tr>
-            <td>${fb.name}</td>
-            <td>${fb.email}</td>
-            <td>${fb.message}</td>
-        </tr>`;
+            let row = `<tr>
+                <td>${fb.name}</td>
+                <td>${fb.email}</td>
+                <td>${fb.message}</td>
+            </tr>`;
 
-        table.innerHTML += row;
+            table.innerHTML += row;
+        });
     });
-});
+}
